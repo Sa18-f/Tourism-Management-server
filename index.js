@@ -31,7 +31,13 @@ async function run() {
         await client.connect();
         const spotsCollection = client.db('spotsDB').collection('spots');
 
-        app.post('/spot', async(req, res) =>{
+        app.get('/spots', async (req, res) => {
+            const cursor = spotsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        });
+
+        app.post('/spots', async (req, res) => {
             const newSpot = req.body;
             console.log(newSpot);
             const result = await spotsCollection.insertOne(newSpot);
