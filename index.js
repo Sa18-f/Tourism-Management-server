@@ -43,7 +43,25 @@ async function run() {
             const result = await spotsCollection.findOne(query);
             res.send(result)
         });
-
+        // Update
+        app.put('/spots/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedSpot = req.body;
+            const spot = {
+                $set: {
+                    tourists_spot_name: updatedSpot.tourists_spot_name,
+                    country_Name: updatedSpot.country_Name,
+                    seasonality: updatedSpot.seasonality,
+                    photo: updatedSpot.photo,
+                    travel_time: updatedSpot.travel_time,
+                    average_cost: updatedSpot.average_cost, totalVisitorsPerYear: updatedSpot.totalVisitorsPerYear
+                }
+            };
+            const result = await spotsCollection.updateOne(filter, spot, options);
+            res.send(result)
+        });
         // spots collection
         app.post('/spots', async (req, res) => {
             const newSpot = req.body;
@@ -59,7 +77,7 @@ async function run() {
             res.send(result)
         })
         // update page 
-        
+
         // delete from my list page
         app.delete('/spots/:id', async (req, res) => {
             const id = req.params.id;
