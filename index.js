@@ -30,7 +30,6 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const spotsCollection = client.db('spotsDB').collection('spots');
-        const userCollection = client.db('usersDB').collection('user');
 
         app.get('/spots', async (req, res) => {
             const cursor = spotsCollection.find();
@@ -38,12 +37,13 @@ async function run() {
             res.send(result)
         });
         // view details page
-        app.get('/spots/:id', async(req, res) =>{
+        app.get('/spots/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await spotsCollection.findOne(query);
             res.send(result)
-        })
+        });
+
         // spots collection
         app.post('/spots', async (req, res) => {
             const newSpot = req.body;
@@ -52,12 +52,20 @@ async function run() {
             res.send(result)
         });
 
-        // user related api
-        app.post('/user', async (req, res) => {
-            const user = req.body;
-            console.log(user);
-            const result = await userCollection.insertOne(user);
+        // my list page
+        app.get("/myList/:email", async (req, res) => {
+            console.log(req.params.email);
+            const result = await spotsCollection.find({ email: req.params.email }).toArray();
             res.send(result)
+        })
+        // update page 
+        
+        // delete from my list page
+        app.delete('/spots/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await spotsCollection.deleteOne(query);
+            res.json(result);
         });
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
