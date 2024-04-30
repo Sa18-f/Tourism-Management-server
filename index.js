@@ -30,6 +30,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const spotsCollection = client.db('spotsDB').collection('spots');
+        const countriesCollection = client.db('spotsDB').collection('countries');
 
         app.get('/spots', async (req, res) => {
             const cursor = spotsCollection.find();
@@ -72,11 +73,9 @@ async function run() {
 
         // my list page
         app.get("/myList/:email", async (req, res) => {
-            console.log(req.params.email);
             const result = await spotsCollection.find({ email: req.params.email }).toArray();
             res.send(result)
         })
-        // update page 
 
         // delete from my list page
         app.delete('/spots/:id', async (req, res) => {
@@ -85,6 +84,25 @@ async function run() {
             const result = await spotsCollection.deleteOne(query);
             res.json(result);
         });
+        // country Details
+        app.get('/countries/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await countriesCollection.findOne(query);
+            res.send(result)
+        });
+
+        // country get
+        app.get('/countries', async (req, res) => {
+            const countries = await countriesCollection.find().toArray();
+            res.json(countries);
+        });
+        // Country post
+        app.post('/countries', async (req, res) => {
+            const countries = req.body;
+            const result = await countriesCollection.insertOne(countries);
+            res.json(result);
+        });        
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
